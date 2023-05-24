@@ -42,7 +42,11 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/types.h>
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <win_shim/win_shim.h>
+#else
 #include <sys/uio.h>
+#endif
 
 /**
  *  Function return code

@@ -62,6 +62,10 @@ file(GLOB_RECURSE TLS_SRC "tls/*.c")
 
 file(GLOB UTILS_HEADERS "utils/*.h")
 file(GLOB UTILS_SRC "utils/*.c")
+if (WINDOWS)
+    list(APPEND UTILS_HEADERS "win_shim/win_shim.h")
+    list(APPEND UTILS_SRC "win_shim/mmap-windows.c")
+endif (WINDOWS)
 
 # Always include the top-level pq-crypto/ files
 file(GLOB PQ_HEADERS "pq-crypto/*.h")
@@ -268,11 +272,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${VERSION_MAJOR})
 
 set(CMAKE_C_FLAGS_DEBUGOPT "")
 
-target_compile_options(${PROJECT_NAME} PRIVATE -pedantic -std=gnu99 -Wall -Wimplicit -Wunused -Wcomment -Wchar-subscripts
-        -Wuninitialized -Wshadow -Wcast-align -Wwrite-strings -Wno-deprecated-declarations -Wno-unknown-pragmas -Wformat-security
-        -Wno-missing-braces -Wno-strict-prototypes -Wa,--noexecstack
-)
-
+if (NOT MSVC AND NOT CYGWIN AND NOT MSYS AND NOT MINGW)
+    target_compile_options(${PROJECT_NAME} PRIVATE -pedantic -std=gnu99 -Wall -Wimplicit -Wunused -Wcomment -Wchar-subscripts
+            -Wuninitialized -Wshadow -Wcast-align -Wwrite-strings -Wno-deprecated-declarations -Wno-unknown-pragmas -Wformat-security
+            -Wno-missing-braces -Wno-strict-prototypes -Wa,--noexecstack
+    )
+endif ()
 if (EXPERIMENTAL_TREAT_WARNINGS_AS_ERRORS)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wsign-compare )
 endif()
@@ -295,7 +300,7 @@ if(S2N_LTO)
     endif()
 endif()
 
-if(NOT APPLE)
+if(NOT APPLE AND NOT WINDOWS)
     set(CMAKE_SHARED_LINKER_FLAGS -Wl,-z,noexecstack,-z,relro,-z,now)
 endif()
 

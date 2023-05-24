@@ -15,10 +15,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#else
+#include <sys/mman.h>
 #include <unistd.h>
+#endif
 
 #include "error/s2n_errno.h"
 #include "stuffer/s2n_stuffer.h"
